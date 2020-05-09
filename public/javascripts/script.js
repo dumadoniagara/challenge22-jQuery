@@ -8,13 +8,14 @@ $(document).ready(() => {
     });
 
     $('.btn-edit').on('click', '.btn-change', function (e) {
-        
-        
+        let id = $('#editId').val();
         let string = $('#editString').val();
         let integer = $('#editInteger').val();
         let float = $('#editFloat').val();
         let date = $('#editDate').val();
         let boolean = $('#editBoolean').val();
+
+        console.log([id, string, integer, float, date, boolean])
         editData(id, string, integer, float, date, boolean);
     })
 
@@ -75,10 +76,10 @@ const loadData = () => {
         data: { page, id, string, integer, float, startDate, endDate, boolean, cId, cString, cFloat, cInteger, cDate, cBoolean },
         dataType: "json"
     }).done(result => {
-
-        // DEBUG DULU
-
         const data = result.result;
+        if (data.length == 0) {
+            return $("#notFoundModal").modal('show');
+        }
         let page = result.page;
         let pages = result.pages;
         let html = "";
@@ -119,8 +120,7 @@ const loadData = () => {
         $('nav ul').html(pagination);
     })
         .fail(function (err) {
-            $("#notFoundModal").modal('show');
-            console.log('Data yang diminta tidak ditemukan')
+            console.log('error-read')
         });
 }
 
@@ -179,7 +179,6 @@ const dataModal = id => {
     })
         .done(result => {
             let item = result.data
-            console.log(item);
             let html = '';
             $('#editId').val(item._id);
             $('#editString').val(item.string);
@@ -199,5 +198,4 @@ const dataModal = id => {
         .fail(() => {
             console.log('edit-data gagal');
         })
-
 };
