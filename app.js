@@ -29,13 +29,10 @@ const client = new MongoClient(url);
 client.connect(function (err) {
   assert.equal(null, err);
   console.log("Connected successfully to server");
-  const dbName = 'ch22';
-  // coll for 'data' collection
-  const coll = 'data';
-
+ 
   // connect to 'ch22' db in mongodb
-  const db = client.db(dbName);
-  var apiRouter = require('./routes/api')(db, coll);
+  const db = client.db('ch22');
+  var apiRouter = require('./routes/api')(db);
 
   app.use('/api', apiRouter);
 

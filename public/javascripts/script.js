@@ -8,13 +8,14 @@ $(document).ready(() => {
     });
 
     $('.btn-edit').on('click', '.btn-change', function (e) {
-        let id = $('#editId').val();
+        
+        
         let string = $('#editString').val();
         let integer = $('#editInteger').val();
         let float = $('#editFloat').val();
         let date = $('#editDate').val();
-        let bool = $('#editBoolean').val();
-        editData(id, string, integer, float, date, bool);
+        let boolean = $('#editBoolean').val();
+        editData(id, string, integer, float, date, boolean);
     })
 
     $('.btn-add').on('click', '.btn-save', function (e) {
@@ -22,8 +23,9 @@ $(document).ready(() => {
         let integer = $('#addInteger').val();
         let float = $('#addFloat').val();
         let date = $('#addDate').val();
-        let bool = $('#addBoolean').val();
-        addData(string, integer, float, date, bool);
+        let boolean = $('#addBoolean').val();
+        console.log(string, integer, float, date, boolean)
+        addData(string, integer, float, date, boolean);
     })
 
     $('table tbody').on('click', '.btn-delete', function () {
@@ -74,7 +76,7 @@ const loadData = () => {
         dataType: "json"
     }).done(result => {
 
-// DEBUG DULU
+        // DEBUG DULU
 
         const data = result.result;
         let page = result.page;
@@ -89,8 +91,8 @@ const loadData = () => {
                     <td>${moment(item.date).format('DD-MMMM-YYYY')}</td>
                     <td>${item.boolean}</td>
                     <td>
-                      <button type="button" class="btn btn-success btn-edit" dataid="${item.id}" data-toggle="modal" data-target="#editModal"> Edit </button>
-                      <button type="button" class="btn btn-danger btn-delete" dataid="${item.id}"> Delete </button>
+                      <button type="button" class="btn btn-success btn-edit" dataid="${item._id}" data-toggle="modal" data-target="#editModal"> Edit </button>
+                      <button type="button" class="btn btn-danger btn-delete" dataid="${item._id}"> Delete </button>
                     </td>                  
                 </tr>`
         });
@@ -123,11 +125,11 @@ const loadData = () => {
 }
 
 // ==================== Add ======================================
-const addData = (stringdata, integerdata, floatdata, datedata, booleandata) => {
+const addData = (string, integer, float, date, boolean) => {
     $.ajax({
         method: "POST",
         url: "http://localhost:3000/api/",
-        data: { stringdata, integerdata, floatdata, datedata, booleandata },
+        data: { string, integer, float, date, boolean },
         dataType: 'json'
     }).done(() => {
         loadData();
@@ -154,11 +156,11 @@ const deleteData = (id) => {
 }
 
 // ===================== Edit (PUT)===================================
-const editData = (id, stringdata, integerdata, floatdata, datedata, booleandata) => {
+const editData = (id, string, integer, float, date, boolean) => {
     $.ajax({
         method: "PUT",
         url: "http://localhost:3000/api/" + id,
-        data: { stringdata, integerdata, floatdata, datedata, booleandata },
+        data: { string, integer, float, date, boolean },
         dataType: 'json'
     }).done(() => {
         loadData();
@@ -176,16 +178,16 @@ const dataModal = id => {
         dataType: 'json'
     })
         .done(result => {
-            // console.log(result);
+            let item = result.data
+            console.log(item);
             let html = '';
-            let item = result.data;
-            $('#editId').val(item.id);
-            $('#editString').val(item.stringdata);
-            $('#editInteger').val(item.integerdata);
-            $('#editFloat').val(item.floatdata);
-            $('#editDate').val(moment(item.datedata).format('YYYY-MM-DD'));
+            $('#editId').val(item._id);
+            $('#editString').val(item.string);
+            $('#editInteger').val(item.integer);
+            $('#editFloat').val(item.float);
+            $('#editDate').val(moment(item.date).format('YYYY-MM-DD'));
 
-            if (item.booleandata == true) {
+            if (item.boolean == true) {
                 html += `<option value="true" selected>true</option>
                             <option value="false">false</option>`;
             } else {

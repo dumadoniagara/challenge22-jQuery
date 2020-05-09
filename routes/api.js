@@ -5,7 +5,8 @@ const objectId = require('mongodb').ObjectId;
 
 
 /* GET home page. */
-module.exports = (db, coll) => {
+module.exports = (db) => {
+  const coll = 'data';
   router.get('/', function (req, res, next) {
     const page = parseInt(req.query.page) || 1;
     const { id, string, integer, float, startDate, endDate, boolean, cId, cString, cFloat, cInteger, cDate, cBoolean } = req.query;
@@ -61,74 +62,85 @@ module.exports = (db, coll) => {
       });
   });
 
-  // // Add
-  // router.get('/add', (req, res) => {
-  //   res.status(200).render('add');
-  // })
+  // ============= Add ================
+  router.post('/', (req, res) => {
+    const add = { "string": req.body.string, "integer": parseInt(req.body.integer), "float": parseFloat(req.body.float), "date": req.body.date, "boolean": JSON.parse(req.body.boolean) }
+    db.collection(coll).insertOne(add)
+      .then(() => res.status(201).json({
+        error: false,
+        message: 'data berhasil ditambahkan'
+      }))
+      .catch(err =>
+        res.status(500).json({
+          error: true,
+          message: err
+        }))
+  });
 
-  // router.post('/add', (req, res) => {
-  //   const add = { "string": req.body.stringdata, "integer": parseInt(req.body.integerdata), "float": parseFloat(req.body.floatdata), "date": req.body.datedata, "boolean": JSON.parse(req.body.booleandata) }
+  // Delete
+  router.delete('/:id', (req, res) => {
+    const id = req.params.id;
+    db.collection(coll).deleteOne({ _id: objectId(id) })
+      .then(() => {
+        res.status(201).json({
+          error: false,
+          message: 'data berhasil dihapus'
+        })
+      })
+      .catch((err) => {
+        res.status(500).json({
+          error: true,
+          message: err
+        })
+      })
+  });
 
-  //   db.collection(coll).insertOne(add)
-  //     .then(() => res.redirect('/'))
-  //     .catch(err =>
-  //       res.status(500).json({
-  //         error: true,
-  //         message: err
-  //       }))
-  // });
+  // ================ Show Data Edit ==========
 
-  // // Delete
-  // router.get('/delete/:id', (req, res) => {
-  //   const id = req.params.id;
-  //   db.collection(coll).deleteOne({ _id: objectId(id) })
-  //     .then(() => res.redirect('/'))
-  //     .catch((err) => {
-  //       res.status(500).json({
-  //         error: true,
-  //         message: err
-  //       })
-  //     })
-  // });
+  router.get('/:id', (req, res) => {
+    const id = req.params.id;
+    db.collection(coll).findOne({ _id: objectId(id) })
+      .then((data) => {
+        res.status(200).json({
+          data
+        })
+      })
+      .catch((err) => {
+        res.status(500).json({
+          error: true,
+          message: err
+        })
+      })
+  })
 
 
-  // // Edit
-  // router.get('/edit/:id', (req, res) => {
-  //   const id = req.params.id;
-  //   db.collection(coll).findOne({ _id: objectId(id) })
-  //     .then((result) => {
-  //       res.render('edit', { row: result });
-  //     })
-  //     .catch((err) => {
-  //       res.status(500).json({
-  //         error: true,
-  //         message: err
-  //       })
-  //     })
-  // })
 
-  // router.post('/edit/:id', (req, res) => {
-  //   const id = req.params.id;
 
-  //   db.collection(coll).updateOne(
-  //     { _id: objectId(id) },
-  //     {
-  //       $set: {
-  //         string: req.body.string,
-  //         integer: parseInt(req.body.integer),
-  //         float: parseFloat(req.body.float),
-  //         date: req.body.date,
-  //         boolean: JSON.parse(req.body.boolean)
-  //       }
-  //     })
-  //     .then(() => res.redirect('/'))
-  //     .catch((err) => {
-  //       res.status(500).json({
-  //         error: true,
-  //         message: err
-  //       })
-  //     })
-  // })
+  // =============== Edit =====================
+  router.put('/:id', (req, res) => {
+    const id = req.params.id;
+    db.collection(coll).updateOne(
+      { _id: objectId(id) },
+      {
+        $set: {
+          string: req.body.string,
+          integer: parseInt(req.body.integer),
+          float: parseFloat(req.body.float),
+          date: req.body.date,
+          boolean: JSON.parse(req.body.boolean)
+        }
+      })
+      .then(() => res.status(201).json({
+        error : false,
+        message : 'data berhasil diganti'
+      }))
+      .catch((err) => {
+        res.status(500).json({
+          error: true,
+          message: err
+        })
+      })
+  })
   return router;
 }
 
